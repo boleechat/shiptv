@@ -32,7 +32,4 @@ jobs:
 
       - name: Notify
         if: failure()
-        uses: serot/discord-webhook-action@v2
-        env:  
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          content: "Video stream check failed! URL is $url"
+        curl -H "Content-Type: application/json" -d '{"content":"Video stream check failed! URL is $url"}' ${{ secrets.DISCORD_WEBHOOK }}
