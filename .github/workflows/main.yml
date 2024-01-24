@@ -1,13 +1,9 @@
-我将代码修改成以下：
-name: Check Video Stream 
+name: Check Video Stream
 
-on:
-  schedule:
+on: 
+  schedule: 
     - cron: "0 0 * * *"
-  release:
-    types: [created]
-  workflow_dispatch: # Put here!!
-  
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -16,28 +12,20 @@ jobs:
       - name: Search address from fofa
         run: |
           encoded_query="InVkcHh5IiAmJiByZWdpb249IlNoYW5naGFpIg%3D%3D"
-	  result=$(curl -s "https://fofa.info/result?qbase64=$encoded_query")
+
+          result=$(curl -s "https://fofa.info/result?qbase64=$encoded_query")
           url=$(jq -r '.results[0].cert_domain' <(echo "$result"))
 
-      - name: Check stream accessibility 
+      - name: Check stream accessibility
         run: |
-          curl -I "$url/udp/239.45.3.146:5140" 
+          curl -I "$url/udp/239.45.3.146:5140"
           if [[ $? -eq 0 ]]; then
-            echo "Stream is accessible"
-            echo "$url" >> stream_url.txt
-          else
-            echo "Stream is not accessible"  
+            echo "Stream accessible"
+          else  
+            echo "Stream not accessible" 
           fi
 
-      - name: Notify
+      - name: Notify on failure
         if: failure()
         run: |
-          curl -H "Content-Type: application/json" -d "{\"content\":\"Video stream check failed! URL is $url\"}" ${{ secrets.DISCORD_WEBHOOK }}
-
-
-出错如下
-
-Run query='udpxy" && region="Shanghai"'
-parse error: Invalid numeric literal at line 1, column 10
-/home/runner/work/_temp/c4c3d2fb-2b42-44b1-b709-d31e3b239c65.sh: line 5: echo: write error: Broken pipe
-Error: Process completed with exit code 4.
+          curl -H "Content-Type: application/json" -d "{\"content\":\"Check failed\"}" ${{ secrets.DISCORD_WEBHOOK }}
