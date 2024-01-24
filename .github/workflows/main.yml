@@ -30,9 +30,9 @@ jobs:
             echo "Stream is not accessible"  
           fi
 
-      - name: Notify 
+      - name: Notify
         if: failure()
-        uses: actions/discord@main 
-        with:
+        uses: serot/discord-webhook-action@v2
+        env:  
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          message: "Video stream check failed! URL is $url"
+          content: "Video stream check failed! URL is $url"
