@@ -14,10 +14,9 @@ jobs:
     steps:
       - name: Search address from fofa
         run: |
-          encoded_query="InVkcHh5IiAmJiByZWdpb249IlNoYW5naGFpIg%3D%3D"
-
-          result=$(curl -s "https://fofa.info/result?qbase64=$encoded_query")
-          url=$(jq -r '.results[0].cert_domain' <(echo "$result"))
+          query="udpxy\" && region=\"Shanghai\""
+          result=$(curl -s "https://fofa.info/result?q=$query")
+          url=$(jq -r '.results[0].cert_domain' <<< "$result")
 
       - name: Check stream accessibility
         run: |
