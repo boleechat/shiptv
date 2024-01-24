@@ -31,5 +31,6 @@ jobs:
           fi
 
       - name: Notify
+        if: failure()
         run: |
-          curl -H "Content-Type: application/json" -d '{"content":"Video stream check failed! URL is $url"}' ${{ secrets.DISCORD_WEBHOOK }}
+          curl -H "Content-Type: application/json" -d "{\"content\":\"Video stream check failed! URL is $url\"}" ${{ secrets.DISCORD_WEBHOOK }}
