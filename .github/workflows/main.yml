@@ -30,9 +30,9 @@ jobs:
             echo "Stream is not accessible"  
           fi
 
-      - name: Notify
+      - name: Notify 
         if: failure()
-        uses: appleboy/discord-webhook-action@master
-        env:
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-          DISCORD_MESSAGE: "Video stream check failed! URL is $url"
+        uses: actions/discord@main 
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          message: "Video stream check failed! URL is $url"
