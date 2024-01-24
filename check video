@@ -1,0 +1,22 @@
+name: Check Video Stream
+
+on:
+  schedule: 
+    - cron: "0 0 * * *" # 每天 midnight 运行
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Search foip address
+        run: |
+          url=$(curl -s "https://fofa.info/search?q=udpxy%20region%3D%22Shanghai%22" | grep -Eo "http://[^ ]+")
+
+      - name: Check stream
+        run: |
+          curl -I "$url/udp/239.45.3.146:5140"
+          if [[ $? -eq 0 ]]; then
+            echo "Stream is accessible, URL is $url" > stream_url.txt
+          else
+            echo "Stream is not accessible"
+          fi
