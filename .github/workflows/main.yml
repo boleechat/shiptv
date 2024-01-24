@@ -1,25 +1,35 @@
-name: Check Video Stream
-#PUSG
+name: Check Video Stream 
+
 on:
-  schedule: 
-    - cron: "0 0 * * *" # 每天 midnight 运行
-  release:
-    types: [created]
-  workflow_dispatch: # Put here!!
-  
+  schedule:
+    - cron: "0 0 * * *"
+
 jobs:
   check:
     runs-on: ubuntu-latest
-    steps:
-      - name: Search foip address
-        run: |
-          url=$(curl -s "https://fofa.info/search?q=udpxy%20region%3D%22Shanghai%22" | grep -Eo "http://[^ ]+")
 
-      - name: Check stream
+    steps:
+      - name: Search address from fofa
         run: |
-          curl -I "$url/udp/239.45.3.146:5140"
+          query='udpxy" && region="Shanghai"'
+          encoded_query=$(echo -n "$query" | base64)
+
+          result=$(curl -s "https://fofa.info/result?qbase64=$encoded_query")
+          url=$(jq -r '.results[0].cert_domain' <(echo "$result"))
+
+      - name: Check stream accessibility 
+        run: |
+          curl -I "$url/udp/239.45.3.146:5140" 
           if [[ $? -eq 0 ]]; then
-            echo "Stream is accessible, URL is $url" > stream_url.txt
+            echo "Stream is accessible"
+            echo "$url" >> stream_url.txt
           else
-            echo "Stream is not accessible"
+            echo "Stream is not accessible"  
           fi
+
+      - name: Notify
+        if: failure()
+        uses: appleboy/discord-webhook-action@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          DISCORD_MESSAGE: "Video stream check failed! URL is $url"
