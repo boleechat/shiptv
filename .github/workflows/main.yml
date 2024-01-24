@@ -3,7 +3,11 @@ name: Check Video Stream
 on:
   schedule: 
     - cron: "0 0 * * *" # 每天 midnight 运行
-
+on:
+  release:
+    types: [created]
+  workflow_dispatch: # Put here!!
+  
 jobs:
   check:
     runs-on: ubuntu-latest
